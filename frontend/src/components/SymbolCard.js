@@ -1,56 +1,46 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import LoadingSpinner from "./LoadingSpinner";
+import { createWebSocket } from "../api";
 
 function SymbolCard({ symbol }) {
   const [realTimeData, setRealTimeData] = useState(null);
   const [ws, setWs] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [isRealTimeActive, setIsRealTimeActive] = useState(false);
   const [error, setError] = useState(null);
 
   const handleRealTimeDataClick = useCallback(() => {
     if (!ws) {
-      const newWs = new WebSocket(`ws://localhost:8000/${symbol}`);
+      const newWs = createWebSocket(
+        symbol,
+        (data) => {
+          setRealTimeData(data);
+          setLoading(false);
+          setError(null);
+        },
+        (error) => {
+          setError(error);
+          setLoading(false);
+        },
+        () => {
+          setWs(null);
+          setRealTimeData(null);
+          setLoading(false);
+        }
+      );
       setWs(newWs);
-      setIsRealTimeActive(true);
     } else {
       ws.close();
-      setIsRealTimeActive(false);
     }
   }, [ws, symbol]);
 
   useEffect(() => {
-    if (ws) {
-      setLoading(true);
-      ws.onmessage = (event) => {
-        try {
-          setRealTimeData(JSON.parse(event.data));
-          setLoading(false);
-          setError(null);
-        } catch (error) {
-          console.error("Veri ayrıştırma hatası:", error);
-          setError("Veri ayrıştırma hatası oluştu.");
-          setLoading(false);
-        }
-      };
-      ws.onerror = (error) => {
-        console.error("WebSocket hatası:", error);
-        setError("WebSocket bağlantı hatası oluştu.");
-        setLoading(false);
-      };
-      ws.onclose = () => {
-        setWs(null);
-        setRealTimeData(null);
-        setLoading(false);
-      };
-    }
     return () => {
       if (ws) {
         ws.close();
       }
     };
-  }, [ws, isRealTimeActive]);
+  }, [ws]);
 
   return (
     <div

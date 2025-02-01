@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import SymbolCard from "../components/SymbolCard";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { fetchSymbols } from "../api";
 
 function SymbolsList() {
   const [symbols, setSymbols] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSymbols = async () => {
+    const loadSymbols = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/symbols");
-        setSymbols(response.data);
+        const data = await fetchSymbols();
+        setSymbols(data);
       } catch (error) {
         console.error("Error fetching symbols:", error);
       } finally {
@@ -19,7 +19,7 @@ function SymbolsList() {
       }
     };
 
-    fetchSymbols();
+    loadSymbols();
   }, []);
 
   return (

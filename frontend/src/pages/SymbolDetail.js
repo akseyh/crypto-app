@@ -7,48 +7,40 @@ import {
   faEquals,
 } from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { createWebSocket } from "../api";
 
 function SymbolDetail() {
   const { symbol } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:8000/${symbol}`);
-
-    ws.onopen = () => {
-      console.log("WebSocket bağlantısı açıldı");
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const parsedData = JSON.parse(event.data);
-        setData(parsedData);
+    const newWs = createWebSocket(
+      symbol,
+      (data) => {
+        setData(data);
         setLoading(false);
         setError(null);
-      } catch (error) {
-        console.error("Veri ayrıştırma hatası:", error);
-        setError("Veri ayrıştırma hatası oluştu.");
+      },
+      (error) => {
+        setError(error);
+        setLoading(false);
+      },
+      () => {
+        setWs(null);
         setLoading(false);
       }
-    };
-
-    ws.onerror = (error) => {
-      console.error("WebSocket hatası:", error);
-      setError("WebSocket bağlantı hatası oluştu.");
-      setLoading(false);
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket bağlantısı kapatıldı");
-      setLoading(false);
-    };
+    );
+    setWs(newWs);
 
     return () => {
-      ws.close();
+      if (ws) {
+        ws.close();
+      }
     };
-  }, [symbol]);
+  }, [ws, symbol]);
 
   const getChangeIcon = () => {
     if (!data) return null;
