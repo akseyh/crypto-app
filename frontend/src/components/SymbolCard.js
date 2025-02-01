@@ -11,6 +11,7 @@ function SymbolCard({ symbol }) {
 
   const handleRealTimeDataClick = useCallback(() => {
     if (!ws) {
+      setLoading(true);
       const newWs = createWebSocket(
         symbol,
         (data) => {
