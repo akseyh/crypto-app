@@ -4,6 +4,22 @@ This is the cryptocurrency application that provides real-time price updates via
 
 ## How to Run
 
+### Docker
+
+This application can also be run using Docker. Here are the steps to build and run the application using Docker:
+
+#### Prerequisites
+
+- Docker installed on your machine. You can download it from [docker.com](https://www.docker.com/get-started).
+
+#### Running the Docker Container
+
+1.  Run the Docker container:
+    ```bash
+    docker compose up -d
+    ```
+    This will start both the frontend and backend applications inside the Docker container. The frontend will be accessible at `http://localhost:3000` and the backend at `http://localhost:8000` by default.
+
 ### Backend Application
 
 1.  **Install Node.js:** Make sure you have Node.js installed on your computer. You can download it from [nodejs.org](https://nodejs.org).
