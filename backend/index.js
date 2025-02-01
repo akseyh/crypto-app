@@ -4,6 +4,7 @@ import cors from "cors";
 import http from "http";
 import BinanceService from "./services/BinanceService.js";
 import dotenv from "dotenv";
+import cacheMiddleware from "./middlewares/cacheMiddleware.js";
 dotenv.config();
 
 const app = express();
@@ -60,7 +61,7 @@ binanceService.createWebSocketStream(
   }
 );
 
-app.get("/symbols", async (req, res) => {
+app.get("/symbols", cacheMiddleware(60 * 5), async (req, res) => {
   try {
     const symbols = await binanceService.getSymbols();
     res.json(symbols);
