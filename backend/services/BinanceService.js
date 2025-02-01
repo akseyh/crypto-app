@@ -5,20 +5,13 @@ class BinanceService {
   constructor() {
     this.client = new Spot();
     this.ws = null;
-    this.symbols = [];
   }
 
   async getSymbols() {
     try {
-      if (this.symbols.length === 0) {
-        const response = await this.client.exchangeInfo();
+      const response = await this.client.exchangeInfo();
 
-        this.symbols = response.data.symbols
-          .map((symbol) => symbol.symbol)
-          .slice(0, 100);
-      }
-
-      return this.symbols;
+      return response.data.symbols.map((symbol) => symbol.symbol).slice(0, 100);
     } catch (error) {
       console.error("Semboller alınırken hata oluştu:", error);
       throw error;
